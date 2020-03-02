@@ -20,13 +20,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import io.javabrains.coronavirustracker.models.LocationStats;
+import io.javabrains.coronavirustracker.utils.Constants;
 
 @Service
 @Data
 public class CoronaVirusDataService {
 
-    final private static String VIRUS_DATA_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
     private List<LocationStats> allStats = new ArrayList<>();
+    private int counter = 0;
 
     @PostConstruct
     @Scheduled(cron = "* 1 * * * *")
@@ -34,14 +35,20 @@ public class CoronaVirusDataService {
         List<LocationStats> newStats = new ArrayList<>();
 
         HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(VIRUS_DATA_URL)).build();
-        HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        StringReader stringReader = new StringReader(httpResponse.body());
-        Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(stringReader);
+        HttpRequest confirmedRequest = HttpRequest.newBuilder().uri(URI.create(Constants.CONFIRMED_VIRUS_DATA_URL)).build();
+        HttpResponse<String> confirmedHttpResponse = client.send(confirmedRequest, HttpResponse.BodyHandlers.ofString());
+        StringReader confirmedStringReader = new StringReader(confirmedHttpResponse.body());
+        Iterable<CSVRecord> confirmedRecords = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(confirmedStringReader);
 
-        for (CSVRecord record : records) {
+        HttpRequest recoveredRequest = HttpRequest.newBuilder().uri(URI.create(Constants.RECOVERED_VIRUS_DATA_URL)).build();
+        HttpResponse<String> recoveredHttpResponse = client.send(recoveredRequest, HttpResponse.BodyHandlers.ofString());
+        StringReader recoveredStringReader = new StringReader(recoveredHttpResponse.body());
+        Iterable<CSVRecord> recoveredRecords = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(recoveredStringReader);
+
+        for (CSVRecord record : confirmedRecords) {
             LocationStats locationStats = new LocationStats();
+            locationStats.setId(counter++);
             locationStats.setState(record.get("Province/State"));
             locationStats.setCountry(record.get("Country/Region"));
 
@@ -51,6 +58,13 @@ public class CoronaVirusDataService {
             locationStats.setLatestTotalCases(latestCases);
             locationStats.setDiffFromPreviousDay(latestCases - previousCases);
             newStats.add(locationStats);
+        }
+
+        counter = 0;
+
+        for (CSVRecord record : recoveredRecords) {
+            int latestRecoveredCases = Integer.parseInt(record.get(record.size() - 1));
+            newStats.get(counter++).setCasesRecovered(latestRecoveredCases);
         }
 
         this.allStats = newStats;
