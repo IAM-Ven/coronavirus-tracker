@@ -10,5 +10,8 @@ public class LocationStats {
     private int latestTotalCases;
     private int diffFromPreviousDay;
     private int casesRecovered;
+    private int recoveredFromPreviousDay;
     private int totalDeaths;
+    private int deathCasesFromPreviousDay;
+
 }

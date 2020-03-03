@@ -30,7 +30,7 @@ public class CoronaVirusDataService {
     private int counter = 0;
 
     @PostConstruct
-    @Scheduled(cron = "* 1 * * * *")
+    @Scheduled(cron = "* * 1 * * *")
     public void fetchVirusData() throws FileNotFoundException, IOException, InterruptedException {
         List<LocationStats> newStats = new ArrayList<>();
 
@@ -45,6 +45,11 @@ public class CoronaVirusDataService {
         HttpResponse<String> recoveredHttpResponse = client.send(recoveredRequest, HttpResponse.BodyHandlers.ofString());
         StringReader recoveredStringReader = new StringReader(recoveredHttpResponse.body());
         Iterable<CSVRecord> recoveredRecords = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(recoveredStringReader);
+
+        HttpRequest deathRequest = HttpRequest.newBuilder().uri(URI.create(Constants.DEATHS_VIRUS_DATA_URL)).build();
+        HttpResponse<String> deathHttpResponse = client.send(deathRequest, HttpResponse.BodyHandlers.ofString());
+        StringReader deathStringReader = new StringReader(deathHttpResponse.body());
+        Iterable<CSVRecord> deathRecords = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(deathStringReader);
 
         for (CSVRecord record : confirmedRecords) {
             LocationStats locationStats = new LocationStats();
@@ -61,10 +66,25 @@ public class CoronaVirusDataService {
         }
 
         counter = 0;
-
         for (CSVRecord record : recoveredRecords) {
             int latestRecoveredCases = Integer.parseInt(record.get(record.size() - 1));
-            newStats.get(counter++).setCasesRecovered(latestRecoveredCases);
+            int previousCases = Integer.parseInt(record.get(record.size() - 2));
+
+            int current_ptr = counter++;
+
+            newStats.get(current_ptr).setCasesRecovered(latestRecoveredCases);
+            newStats.get(current_ptr).setRecoveredFromPreviousDay(latestRecoveredCases-previousCases);
+        }
+
+        counter = 0;
+        for (CSVRecord record : deathRecords) {
+            int deathCases = Integer.parseInt(record.get(record.size() - 1));
+            int previousCases = Integer.parseInt(record.get(record.size() - 2));
+
+            int current_ptr = counter++;
+
+            newStats.get(current_ptr).setTotalDeaths(deathCases);
+            newStats.get(current_ptr).setDeathCasesFromPreviousDay(deathCases-previousCases);
         }
 
         this.allStats = newStats;

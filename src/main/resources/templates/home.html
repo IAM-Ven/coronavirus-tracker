@@ -10,6 +10,60 @@
 <h1>CoronaVirus Tracker Application</h1>
 <p>This reports currently active cases across the globe</p>
 
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                Total Confirmed Cases
+            </div>
+            <div class="card-body">
+                <blockquote class="blockquote mb-0">
+                    <h1 class="display-3" th:text="${totalReportedCases}"></h1>
+                    <footer>
+                        <span>New Cases Reported -</span>
+                        <span th:text="${totalNewCases}"></span>
+                    </footer>
+                </blockquote>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                Total Recovered Cases
+            </div>
+            <div class="card-body">
+                <blockquote class="blockquote mb-0">
+                    <h1 class="display-3" th:text="${totalRecoveredCases}"></h1>
+                    <footer>
+                        <span>New Recovered Cases -</span>
+                        <span th:text="${totalNewRecoveredCases}"></span>
+                    </footer>
+                </blockquote>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                Total Death Cases
+            </div>
+            <div class="card-body">
+                <blockquote class="blockquote mb-0">
+                    <h1 class="display-3" th:text="${totalDeathCases}"></h1>
+                    <footer>
+                        <span>New Deaths Cases -</span>
+                        <span th:text="${totalNewDeathCases}"></span>
+                    </footer>
+                </blockquote>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<!--
 <div class="jumbotron">
     <h1 class="display-3" th:text="${totalReportedCases}"></h1>
     <p class="lead">Total Cases reported as of today.</p>
@@ -20,14 +74,16 @@
     </p>
 
 </div>
+-->
 
-<table class="table">
+<table class="table table-striped">
     <tr>
         <th>State</th>
         <th>Country</th>
         <th>Total Cases Reported</th>
         <th>Changes since last day</th>
         <th>Total Cases Recovered</th>
+        <th>Total Deaths</th>
     </tr>
     <tr th:each="locationStat : ${locationStats}">
         <td th:text="${locationStat.state}"></td>
@@ -35,6 +91,7 @@
         <td th:text="${locationStat.latestTotalCases}">0</td>
         <td th:text="${locationStat.diffFromPreviousDay}">0</td>
         <td th:text="${locationStat.casesRecovered}">0</td>
+        <td th:text="${locationStat.totalDeaths}">0</td>
     </tr>
 </table>
 </body>

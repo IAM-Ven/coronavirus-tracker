@@ -24,6 +24,12 @@ public class HomeController {
         model.addAttribute("locationStats", allStats);
         model.addAttribute("totalReportedCases", allStats.stream().mapToInt(stat -> stat.getLatestTotalCases()).sum());
         model.addAttribute("totalNewCases", allStats.stream().mapToInt(stat -> stat.getDiffFromPreviousDay()).sum());
+
+        model.addAttribute("totalRecoveredCases", allStats.stream().mapToInt(stat -> stat.getCasesRecovered()).sum());
+        model.addAttribute("totalNewRecoveredCases", allStats.stream().mapToInt(stat -> stat.getRecoveredFromPreviousDay()).sum());
+
+        model.addAttribute("totalDeathCases", allStats.stream().mapToInt(stat -> stat.getTotalDeaths()).sum());
+        model.addAttribute("totalNewDeathCases", allStats.stream().mapToInt(stat -> stat.getDeathCasesFromPreviousDay()).sum());
         return "home";
     }
 
