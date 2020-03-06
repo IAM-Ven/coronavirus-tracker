@@ -7,6 +7,7 @@
 
 </head>
 <body class="container">
+
 <h1>CoronaVirus Tracker Application</h1>
 <p>This reports currently active cases across the globe</p>
 
@@ -63,18 +64,7 @@
 
 <br>
 
-<!--
-<div class="jumbotron">
-    <h1 class="display-3" th:text="${totalReportedCases}"></h1>
-    <p class="lead">Total Cases reported as of today.</p>
-    <hr class="my-4">
-    <p>
-        <span>New Cases Reported since previous day.</span>
-        <span th:text="${totalNewCases}"></span>
-    </p>
-
-</div>
--->
+<div id="reportedCases" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 
 <table class="table table-striped">
     <tr>
@@ -94,5 +84,56 @@
         <td th:text="${locationStat.totalDeaths}">0</td>
     </tr>
 </table>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+<script th:inline="javascript">
+    $(function () {
+        Highcharts.chart('reportedCases', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'CoronaVirus Reported Cases'
+            },
+            subtitle: {
+                text: 'Top 10 States in World [Excluding China]'
+            },
+            xAxis: {
+                categories: [[${barChartData.keySet()}]],
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Number of Reported Cases'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat:
+                    '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:0f}</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: [{
+                name: 'Count',
+                data: [[${barChartData.values()}]]
+            }]
+        });
+    });
+</script>
+
+
 </body>
 </html>
