@@ -13,5 +13,4 @@ public class LocationStats {
     private int recoveredFromPreviousDay;
     private int totalDeaths;
     private int deathCasesFromPreviousDay;
-
 }

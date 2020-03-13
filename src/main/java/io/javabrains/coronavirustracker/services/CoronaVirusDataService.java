@@ -15,6 +15,7 @@ import javax.annotation.PostConstruct;
 import lombok.Data;
 
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,8 @@ public class CoronaVirusDataService {
 
     private List<LocationStats> allStats = new ArrayList<>();
     private int counter = 0;
+    private String time = "";
+
 
     @PostConstruct
     @Scheduled(cron = "* * 1 * * *")
@@ -75,6 +78,9 @@ public class CoronaVirusDataService {
             newStats.get(current_ptr).setCasesRecovered(latestRecoveredCases);
             newStats.get(current_ptr).setRecoveredFromPreviousDay(latestRecoveredCases-previousCases);
         }
+
+        for (String name : ((CSVParser) recoveredRecords).getHeaderNames())
+            time = name;
 
         counter = 0;
         for (CSVRecord record : deathRecords) {

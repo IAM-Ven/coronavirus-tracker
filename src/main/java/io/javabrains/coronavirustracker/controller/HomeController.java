@@ -34,14 +34,23 @@ public class HomeController {
         model.addAttribute("totalDeathCases", allStats.stream().mapToInt(stat -> stat.getTotalDeaths()).sum());
         model.addAttribute("totalNewDeathCases", allStats.stream().mapToInt(stat -> stat.getDeathCasesFromPreviousDay()).sum());
 
-        // top 5 countries with most reported cases
+        // top countries with most reported cases
         List<LocationStats> sorted = allStats.stream().filter(line -> !line.getCountry().contains("China") && !line.getCountry().contains("Others")).sorted(Comparator.comparing(LocationStats::getLatestTotalCases).reversed()).collect(Collectors.toList());
-        Map<String, Integer> barChartData = new LinkedHashMap<>();
-        for (int i = 0; i < 10; i++) {
-            barChartData.put(sorted.get(i).getState() + " (" + sorted.get(i).getCountry() + ")", sorted.get(i).getLatestTotalCases());
+        Map<String, Integer> reportedCasesData = new LinkedHashMap<>();
+        for (int i = 0; i < 20; i++) {
+            reportedCasesData.put(sorted.get(i).getState() + " (" + sorted.get(i).getCountry() + ")", sorted.get(i).getLatestTotalCases());
         }
 
-        model.addAttribute("barChartData", barChartData);
+        // top countries with most death cases
+        sorted = allStats.stream().filter(line -> !line.getCountry().contains("China") && !line.getCountry().contains("Others")).sorted(Comparator.comparing(LocationStats::getTotalDeaths).reversed()).collect(Collectors.toList());
+        Map<String, Integer> reportedDeathCases = new LinkedHashMap<>();
+        for (int i = 0; i < 20; i++) {
+            reportedDeathCases.put(sorted.get(i).getState() + " (" + sorted.get(i).getCountry() + ")", sorted.get(i).getTotalDeaths());
+        }
+
+        model.addAttribute("reportedCasesData", reportedCasesData);
+        model.addAttribute("reportedDeathCases", reportedDeathCases);
+        model.addAttribute("lastModifiedDate", coronaVirusDataService.getTime());
 
         return "home";
     }
