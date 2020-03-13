@@ -48,6 +48,14 @@ public class HomeController {
             reportedDeathCases.put(sorted.get(i).getState() + " (" + sorted.get(i).getCountry() + ")", sorted.get(i).getTotalDeaths());
         }
 
+        // top countries with most new cases
+        sorted = allStats.stream().sorted(Comparator.comparing(LocationStats::getDiffFromPreviousDay).reversed()).collect(Collectors.toList());
+        Map<String, Integer> newCases = new LinkedHashMap<>();
+        for (int i = 0; i < 20; i++) {
+            newCases.put(sorted.get(i).getState() + " (" + sorted.get(i).getCountry() + ")", sorted.get(i).getDiffFromPreviousDay());
+        }
+
+        model.addAttribute("newCases", newCases);
         model.addAttribute("reportedCasesData", reportedCasesData);
         model.addAttribute("reportedDeathCases", reportedDeathCases);
         model.addAttribute("lastModifiedDate", coronaVirusDataService.getTime());

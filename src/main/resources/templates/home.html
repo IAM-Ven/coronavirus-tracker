@@ -64,6 +64,8 @@
 
 <br>
 
+<div id="newCases" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
 <div id="reportedCases" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 
 <div id="deathCases" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
@@ -178,6 +180,52 @@
             series: [{
                 name: 'Count',
                 data: [[${reportedDeathCases.values()}]]
+            }]
+        });
+    });
+</script>
+
+<script th:inline="javascript">
+    $(function () {
+        Highcharts.chart('newCases', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'CoronaVirus New Reported Cases'
+            },
+            subtitle: {
+                text: 'Top 20 States in World'
+            },
+            xAxis: {
+                categories: [[${newCases.keySet()}]],
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                tickInterval: 25,
+                title: {
+                    text: 'Number of New Cases'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat:
+                    '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:0f}</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: [{
+                name: 'Count',
+                data: [[${newCases.values()}]]
             }]
         });
     });
